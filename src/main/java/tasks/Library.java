@@ -13,100 +13,75 @@ import java.util.ArrayList;
  * по комбинации этих признаков).
  */
 
-class Book {
-    String name;
-    String author;
-    String genre;
-    String code;
-
-    //конструктор для книги
-    public Book(String name, String author, String genre, String code) {
-        this.name = name;
-        this.author = author;
-        this.genre = genre;
-        this.code = code;
-    }
-}
-
 public class Library {
+
     public ArrayList<Book> library = new ArrayList<Book>();
 
     public static void main(String args[]) {
 
     }
 
-    //узнать есть ли эта книга
-    private int ind(Book oneBook) {
-        int index = -1;
-        for (int i = 0; i < library.size(); i++) {
-            if ((oneBook.name == library.get(i).name) && (oneBook.author == library.get(i).author) &&
-                    (oneBook.genre == library.get(i).genre) && (oneBook.code == library.get(i).code))
-                index = i;
-        }
-        return index;
+    //содержится ли книга в библиотеке
+    public Boolean contains(Book oneBook) {
+        return library.contains(oneBook);
     }
-
 
     //добавить книгу
-    public void add(String name, String author, String genre, String code) {
-        Book oneBook = new Book(name, author, genre, code);
-        int index = ind(oneBook);
+    public void add(Book oneBook) {
+        int index = library.indexOf(oneBook);
         if (index == -1)
             library.add(oneBook);
+        else
+            throw new NullPointerException("такая книга уже существует");
     }
-
 
     //удалить книгу
-    public void remove(String name, String author, String genre, String code) {
-        Book oneBook = new Book(name, author, genre, code);
-        int index = ind(oneBook);
+    public void remove(Book oneBook) {
+        int index = library.indexOf(oneBook);
         if (index != -1)
             library.remove(index);
+        else
+            throw new NullPointerException("такой книги не существует");
     }
 
-    //изменить параметр книги (вводить параметры, которые хотим изменить, остальные оставлять пустыми строками)
+    //изменить параметр книги (вводить параметры, которые хотим изменить, остальные null)
     public void changes(Book oldBook, String name, String author, String genre) {
-        int index = ind(oldBook);
-        String useName = oldBook.name;
-        String useAuthor = oldBook.author;
-        String useGenre = oldBook.genre;
-        if (!(name.isEmpty()))
+        int index = library.indexOf(oldBook);
+        String useName = oldBook.getName();
+        String useAuthor = oldBook.getAuthor();
+        String useGenre = oldBook.getGenre();
+        if (name != null)
             useName = name;
-        if (!(author.isEmpty()))
+        if (author != null)
             useAuthor = author;
-        if (!(genre.isEmpty()))
+        if (genre != null)
             useGenre = genre;
-        Book ans = new Book(useName, useAuthor, useGenre, oldBook.code);
+        Book ans = new Book(useName, useAuthor, useGenre, oldBook.getCode());
         library.set(index, ans);
     }
 
     //переместить книгу на другую полку
     public void shift(Book oldBook, String newCode) {
-        Book makeBook = new Book(oldBook.name, oldBook.author, oldBook.genre, newCode);
-        int index = ind(oldBook);
+        Book makeBook = new Book(oldBook.getName(), oldBook.getAuthor(), oldBook.getGenre(), newCode);
+        int index = library.indexOf(oldBook);
         if (index != -1)
             library.set(index, makeBook);
-    }
-
-    //вывод книги по индексу
-    public Book get(Integer index) {
-        return library.get(index);
-    }
-
-    //поиск книги (вводить известные параметры, неизвестные оставлять пустыми строками)
-    public Book search(String name, String author, String genre, String code) {
-        int index = -1;
-        for (int i = 0; i < library.size(); i++) {
-            if (((name == library.get(i).name) || (name.isEmpty())) && ((author == library.get(i).author) ||
-                    (author.isEmpty())) && ((genre == library.get(i).genre) || (genre.isEmpty())) &&
-                    ((code == library.get(i).code) || (code.isEmpty())))
-                index = i;
-        }
-        if (index != -1)
-            return library.get(index);
         else
-            return new Book("0", "0", "0", "0");
+            throw new NullPointerException("книга для перемещения не найдена");
     }
 
+    //поиск книги (вводить известные параметры, неизвестные null)
+    public Book search(String name, String author, String genre, String code) {
+        Book book = new Book(null, null, null, null);
+        for (Book i : library) {
+            if (((name == null) || (name.equals(i.getName()))) && ((author == null) || (author.equals(i.getAuthor()))) && ((genre == null) ||
+                    (genre.equals(i.getGenre()))) && ((code == null) || (code.equals(i.getCode()))))
+                book = i;
+        }
+        if (book.equals(new Book(null, null, null, null)))
+            throw new NullPointerException("такой книги не существует");
+        else
+            return book;
+    }
 }
 
