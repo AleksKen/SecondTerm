@@ -1,6 +1,7 @@
 package tasks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Хранит информацию о книгах и позволяет их искать.
@@ -15,73 +16,70 @@ import java.util.ArrayList;
 
 public class Library {
 
-    public ArrayList<Book> library = new ArrayList<Book>();
+    public HashSet<Book> library = new HashSet<Book>();
 
     public static void main(String args[]) {
 
     }
 
     //содержится ли книга в библиотеке
-    public Boolean contains(Book oneBook) {
+    public boolean contains(Book oneBook) {
         return library.contains(oneBook);
     }
 
     //добавить книгу
     public void add(Book oneBook) {
-        int index = library.indexOf(oneBook);
-        if (index == -1)
-            library.add(oneBook);
-        else
-            throw new NullPointerException("такая книга уже существует");
+        library.add(oneBook);
     }
 
     //удалить книгу
     public void remove(Book oneBook) {
-        int index = library.indexOf(oneBook);
-        if (index != -1)
-            library.remove(index);
+        if (library.contains(oneBook))
+            library.remove(oneBook);
         else
             throw new NullPointerException("такой книги не существует");
     }
 
     //изменить параметр книги (вводить параметры, которые хотим изменить, остальные null)
     public void changes(Book oldBook, String name, String author, String genre) {
-        int index = library.indexOf(oldBook);
-        String useName = oldBook.getName();
-        String useAuthor = oldBook.getAuthor();
-        String useGenre = oldBook.getGenre();
-        if (name != null)
-            useName = name;
-        if (author != null)
-            useAuthor = author;
-        if (genre != null)
-            useGenre = genre;
-        Book ans = new Book(useName, useAuthor, useGenre, oldBook.getCode());
-        library.set(index, ans);
+        if (library.contains(oldBook)) {
+            String useName = oldBook.getName();
+            String useAuthor = oldBook.getAuthor();
+            String useGenre = oldBook.getGenre();
+            if (name != null)
+                useName = name;
+            if (author != null)
+                useAuthor = author;
+            if (genre != null)
+                useGenre = genre;
+            Book ans = new Book(useName, useAuthor, useGenre, oldBook.getCode());
+            library.remove(oldBook);
+            library.add(ans);
+        } else
+            throw new NullPointerException("отсутствует книга для изменений");
     }
 
     //переместить книгу на другую полку
     public void shift(Book oldBook, String newCode) {
         Book makeBook = new Book(oldBook.getName(), oldBook.getAuthor(), oldBook.getGenre(), newCode);
-        int index = library.indexOf(oldBook);
-        if (index != -1)
-            library.set(index, makeBook);
-        else
+        if (library.contains(oldBook)) {
+            library.remove(oldBook);
+            library.add(makeBook);
+        } else
             throw new NullPointerException("книга для перемещения не найдена");
     }
 
     //поиск книги (вводить известные параметры, неизвестные null)
-    public Book search(String name, String author, String genre, String code) {
-        Book book = new Book(null, null, null, null);
+    public HashSet<Book> search(String name, String author, String genre, String code) {
+        HashSet<Book> booksForYou = new HashSet<Book>();
         for (Book i : library) {
-            if (((name == null) || (name.equals(i.getName()))) && ((author == null) || (author.equals(i.getAuthor()))) && ((genre == null) ||
-                    (genre.equals(i.getGenre()))) && ((code == null) || (code.equals(i.getCode()))))
-                book = i;
+            if (i.simile(name, author, genre, code))
+                booksForYou.add(i);
         }
-        if (book.equals(new Book(null, null, null, null)))
+        if (booksForYou.isEmpty())
             throw new NullPointerException("такой книги не существует");
         else
-            return book;
+            return booksForYou;
     }
 }
 

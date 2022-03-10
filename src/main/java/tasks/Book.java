@@ -1,10 +1,10 @@
 package tasks;
 
 public class Book {
-    private String name;
-    private String author;
-    private String genre;
-    private String code;
+    private final String name;
+    private final String author;
+    private final String genre;
+    private final String code;
 
     //конструктор для книги
     public Book(String name, String author, String genre, String code) {
@@ -20,9 +20,14 @@ public class Book {
             return true;
         if (book == null || this.getClass() != book.getClass())
             return false;
-        tasks.Book input = (tasks.Book) book;
+        Book input = (Book) book;
         return name.equals(input.name) && author.equals(input.author) &&
                 genre.equals(input.genre) && code.equals(input.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode() + author.hashCode() + genre.hashCode() + code.hashCode();
     }
 
     public String getName() {
@@ -39,5 +44,10 @@ public class Book {
 
     public String getCode() {
         return code;
+    }
+
+    public boolean simile(String simName, String simAuthor, String simGenre, String simCode) {
+        return ((simName == null) || (simName.equals(name))) && ((simAuthor == null) || (simAuthor.equals(author))) && ((simGenre == null) ||
+                (simGenre.equals(genre))) && ((simCode == null) || (simCode.equals(code)));
     }
 }
